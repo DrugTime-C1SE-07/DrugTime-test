@@ -1,0 +1,157 @@
+{
+  "result": {
+    "totalCount": 10,
+    "items": [
+      {
+        "soDangKy": "  E2E-001  ",
+        "tenThuoc": "  Thuốc   thử 1  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-002  ",
+        "tenThuoc": "  Thuốc   thử 2  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-003  ",
+        "tenThuoc": "  Thuốc   thử 3  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-004  ",
+        "tenThuoc": "  Thuốc   thử 4  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-005  ",
+        "tenThuoc": "  Thuốc   thử 5  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-006  ",
+        "tenThuoc": "  Thuốc   thử 6  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-007  ",
+        "tenThuoc": "  Thuốc   thử 7  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-008  ",
+        "tenThuoc": "  Thuốc   thử 8  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-009  ",
+        "tenThuoc": "  Thuốc   thử 9  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": false
+      },
+      {
+        "soDangKy": "  E2E-010  ",
+        "tenThuoc": "  Thuốc   thử 10  ",
+        "thongTinThuocCoBan": {
+          "hoatChatChinh": " Paracetamol ",
+          "hamLuong": "500  mg",
+          "dangBaoChe": "Viên nén",
+          "dongGoi": "Hộp 10 viên"
+        },
+        "congTySanXuat": {
+          "tenCongTySanXuat": "Công ty thử",
+          "nuocSanXuat": "Việt Nam"
+        },
+        "isDaRutSoDangKy": true
+      }
+    ]
+  }
+}

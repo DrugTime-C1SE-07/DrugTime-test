@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16.6-bookworm
+    environment:
+      POSTGRES_DB: ${CATALOG_DB}
+      POSTGRES_PASSWORD: ${CATALOG_PASSWORD}
+    ports:
+      - "127.0.0.1::5432"
+    labels:
+      drugtime.catalog-e2e: ${CATALOG_RUN_ID}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 3s
+      retries: 120
+  rabbit:
+    image: rabbitmq:3.13.7-management
+    environment:
+      RABBITMQ_DEFAULT_USER: catalog_e2e
+      RABBITMQ_DEFAULT_PASS: ${CATALOG_PASSWORD}
+    ports:
+      - "127.0.0.1::5672"
+      - "127.0.0.1::15672"
+    labels:
+      drugtime.catalog-e2e: ${CATALOG_RUN_ID}
+    healthcheck:
+      test: [CMD, rabbitmq-diagnostics, -q, ping]
+      interval: 2s
+      timeout: 3s
+      retries: 90
+volumes:
+  pgdata:
+    labels:
+      drugtime.catalog-e2e: ${CATALOG_RUN_ID}
+networks:
+  default:
+    labels:
+      drugtime.catalog-e2e: ${CATALOG_RUN_ID}
