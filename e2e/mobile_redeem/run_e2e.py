@@ -463,7 +463,14 @@ def verify_db(engine, patient, family, records: list[dict], scenario: str, code:
         link = links[0]
         assert link.status == "pending" and link.sharing_enabled is False
         assert records and all(item["code"] == code for item in records), "Mã POST không khớp fixture"
-        assert all(item["response"].get("id") == str(link.id) for item in records), "ID response không khớp DB"
+        assert len(records) == (2 if scenario == "response_lost" else 1), "Số POST redeem không đúng"
+        response_ids = [item["response"].get("id") for item in records]
+        assert all(value == str(link.id) for value in response_ids), (
+            "ID response không khớp DB; "
+            f"response_type={type(response_ids[0]).__name__}, "
+            f"db_type={type(link.id).__name__}, "
+            f"response_length={len(str(response_ids[0]))}, db_length={len(str(link.id))}"
+        )
         assert all(item["response"].get("status") == "pending" for item in records), "Trạng thái response không phải pending"
         assert all(
             datetime.fromisoformat(item["response"]["requested_at"]) == link.linked_at
@@ -471,7 +478,6 @@ def verify_db(engine, patient, family, records: list[dict], scenario: str, code:
         )
         assert link.client_uuid == records[0]["uuid"]
         assert len({item["uuid"] for item in records}) == 1
-        assert len(records) == (2 if scenario == "response_lost" else 1)
         assert [item["status"] for item in records] == (
             [201, 200] if scenario == "response_lost" else [201]
         )
@@ -645,9 +651,22 @@ def main(argv: list[str] | None = None) -> int:
                 backend.kill()
                 backend.wait(timeout=10)
         engine.dispose()
-        shutil.rmtree(temporary, ignore_errors=True)
-        if temporary.exists():
-            failures.append("cleanup:host")
+        for attempt in range(10):
+            try:
+                shutil.rmtree(temporary)
+                break
+            except PermissionError as exc:
+                if attempt < 9:
+                    time.sleep(0.25)  # Windows may still hold the just-closed backend log.
+                    continue
+                failures.append("cleanup:host")
+                failed_name = Path(exc.filename).name if exc.filename else "unknown"
+                print(f"FAIL host cleanup (PermissionError, file={failed_name})", flush=True)
+            except OSError as exc:
+                failures.append("cleanup:host")
+                failed_name = Path(exc.filename).name if exc.filename else "unknown"
+                print(f"FAIL host cleanup ({type(exc).__name__}, errno={exc.errno}, file={failed_name})", flush=True)
+                break
     return 1 if failures else 0
 
 

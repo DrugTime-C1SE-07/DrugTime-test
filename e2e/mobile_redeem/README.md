@@ -1,6 +1,6 @@
 # Redeem flow E2E (task 3.15)
 
-Chạy từ gốc superproject trên Windows, chỉ với Supabase local và Android emulator hoặc điện thoại USB đã bật ADB. Bản APK test phải có cùng chữ ký với app đang cài; nếu ADB báo `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, dừng và dùng thiết bị khác hoặc chỉ gỡ app cũ sau khi chủ máy chấp nhận mất dữ liệu app:
+Chạy từ gốc superproject trên Windows, chỉ với Supabase local và Android emulator hoặc điện thoại USB đã bật ADB. Trên điện thoại thật, runner tạo gói test riêng `vn.drugtime.redeem_e2e` trong `work/3.15-redeem-flow-tests/scratch/mobile_isolated`. App DrugTime hiện có được giữ nguyên.
 
 ```powershell
 cd backend
@@ -12,7 +12,7 @@ backend\.venv\Scripts\python.exe -X utf8 tests\e2e\mobile_redeem\run_e2e.py --ph
 backend\.venv\Scripts\python.exe -X utf8 tests\e2e\mobile_redeem\run_e2e.py --device <serial> --phase qr_invalid
 ```
 
-Không chạy DB deploy. Runner xác minh API và DB đều loopback trước khi tạo fixture, yêu cầu một thiết bị Android online, dùng `api_role` cho backend và session mobile local. Emulator dùng `10.0.2.2`; điện thoại USB dùng `adb reverse` tới `127.0.0.1` và gỡ mapping sau phase. Với phase nhập mã, runner sao lưu file FlutterSecureStorage sẵn có **trong vùng private của app trên điện thoại**, rồi khôi phục trong `finally`; không đọc nội dung phiên ra host. Nếu khôi phục lỗi, runner báo fail và giữ backup để xử lý. Fixture phiên/mã nằm trong file tạm trên host và app private storage; stdout chỉ nêu tên phase và kết quả, không in token/mã/body. `finally` dừng relay/backend, xóa file fixture và dispose DB; cleanup lỗi làm exit khác 0. Vì `access_logs` append-only và liên kết có lịch sử, dữ liệu fixture trong DB local được xóa bằng `supabase db reset` trước lần chạy kế tiếp. Exit 0 = pass, 1 = fail, 2 = thiếu điều kiện. Chạy riêng `--phase` nhiều lần để chọn kịch bản; không chọn thì chạy tất cả.
+Không chạy DB deploy. Runner xác minh API và DB đều loopback trước khi tạo fixture, yêu cầu một thiết bị Android online, dùng `api_role` cho backend và session mobile local. Emulator dùng `10.0.2.2`; điện thoại USB dùng `adb reverse` tới `127.0.0.1` và gỡ mapping sau phase. Với phase nhập mã, runner sao lưu file FlutterSecureStorage sẵn có **trong vùng private của gói test**, rồi khôi phục trong `finally`; không đọc nội dung phiên ra host. Nếu khôi phục lỗi, runner báo fail và giữ backup để xử lý. Fixture phiên/mã nằm trong file tạm trên host và app private storage; stdout chỉ nêu tên phase và kết quả, không in token/mã/body. `finally` dừng relay/backend, xóa file fixture và dispose DB; cleanup lỗi làm exit khác 0. Vì `access_logs` append-only và liên kết có lịch sử, dữ liệu fixture trong DB local được xóa bằng `supabase db reset` trước lần chạy kế tiếp. Exit 0 = pass, 1 = fail, 2 = thiếu điều kiện. Chạy riêng `--phase` nhiều lần để chọn kịch bản; không chọn thì chạy tất cả.
 
 | Phase | Nguồn UI | Điều cần kiểm |
 |---|---|---|
