@@ -153,3 +153,19 @@ def test_existing_session_is_copied_and_restored_inside_app(monkeypatch):
             "files/redeem_e2e_session_backup.xml",
         ),
     ]
+
+
+@pytest.mark.parametrize("remaining", ["", "device tcp:1234 tcp:1234\n"])
+def test_reverse_cleanup_accepts_only_an_absent_mapping(monkeypatch, remaining):
+    def adb_call(_adb, _device, *args):
+        if args == ("reverse", "--remove", "tcp:1234"):
+            raise subprocess.CalledProcessError(1, args)
+        assert args == ("reverse", "--list")
+        return subprocess.CompletedProcess(args, 0, stdout=remaining)
+
+    monkeypatch.setattr(run_e2e, "adb_call", adb_call)
+    if remaining:
+        with pytest.raises(subprocess.CalledProcessError):
+            run_e2e.remove_reverse("adb", "device", 1234)
+    else:
+        run_e2e.remove_reverse("adb", "device", 1234)

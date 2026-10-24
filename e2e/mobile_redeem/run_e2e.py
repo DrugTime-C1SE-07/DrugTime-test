@@ -342,6 +342,17 @@ def adb_call(adb: str, device: str, *args: str, input_text: str | None = None):
     )
 
 
+def remove_reverse(adb: str, device: str, port: int) -> None:
+    try:
+        adb_call(adb, device, "reverse", "--remove", f"tcp:{port}")
+    except subprocess.CalledProcessError:
+        # Flutter may restart adb and drop its reverse mappings. Verify that
+        # this particular mapping is gone rather than masking a cleanup error.
+        remaining = adb_call(adb, device, "reverse", "--list").stdout
+        if f"tcp:{port}" in remaining:
+            raise
+
+
 def install_fixture(adb: str, device: str, host: Path) -> None:
     remote = "/data/local/tmp/drugtime_redeem_fixture.json"
     adb_call(adb, device, "push", str(host), remote)
@@ -465,7 +476,7 @@ def verify_db(engine, patient, family, records: list[dict], scenario: str, code:
         assert records and all(item["code"] == code for item in records), "Mã POST không khớp fixture"
         assert len(records) == (2 if scenario == "response_lost" else 1), "Số POST redeem không đúng"
         response_ids = [item["response"].get("id") for item in records]
-        assert all(value == str(link.id) for value in response_ids), (
+        assert all(str(value) == str(link.id) for value in response_ids), (
             "ID response không khớp DB; "
             f"response_type={type(response_ids[0]).__name__}, "
             f"db_type={type(link.id).__name__}, "
@@ -599,6 +610,12 @@ def main(argv: list[str] | None = None) -> int:
                         cwd=MOBILE, capture_output=True, text=True, timeout=900, check=False
                     )
                     if run.returncode:
+                        if scenario == "unauthorized":
+                            try:
+                                verify_db(engine, patient, family, relay.records, scenario, fixture["code"])
+                                print("CHECK unauthorized: API 401, DB 0 links; UI test failed", flush=True)
+                            except AssertionError:
+                                print("CHECK unauthorized: API/DB assertions failed", flush=True)
                         raise AssertionError(
                             "Flutter integration_test fail: " + redact((run.stdout + run.stderr)[-1600:], known)
                         )
@@ -638,7 +655,7 @@ def main(argv: list[str] | None = None) -> int:
                             print(f"FAIL restore session {scenario} ({type(exc).__name__} at {location.name}:{location.lineno})", flush=True)
                     if reverse_port is not None:
                         try:
-                            adb_call(adb, device, "reverse", "--remove", f"tcp:{reverse_port}")
+                            remove_reverse(adb, device, reverse_port)
                         except (OSError, subprocess.SubprocessError):
                             failures.append(f"reverse:{scenario}")
                             print(f"FAIL reverse cleanup {scenario}", flush=True)
