@@ -6,7 +6,7 @@ Chạy từ gốc superproject bằng Python của backend (cần sqlalchemy, ps
         [--device emulator-5554]
 
 Điều kiện: `supabase start` (từ backend/), một Android emulator đang chạy, `flutter` và `adb` trong PATH.
-Script khởi động backend ở cổng trống (127.0.0.1), chuẩn bị dữ liệu số thử `test_otp`, chạy ba pha
+Script khởi động backend ở cổng trống (127.0.0.1), chuẩn bị tài khoản email thử và Mailpit local, chạy ba pha
 `flutter test integration_test/login_e2e/*` rồi đối chiếu DB sau mỗi pha, và luôn tắt backend khi
 kết thúc. Chỉ chạy với Supabase LOCAL; không in key, token hay mật khẩu DB.
 
@@ -33,7 +33,8 @@ ROOT = Path(__file__).resolve().parents[3]
 BACKEND = ROOT / "backend"
 MOBILE = ROOT / "frontend" / "mobile"
 E2E_DIR = "integration_test/login_e2e"
-TEST_PHONE_DB = "+84900000001"
+TEST_EMAIL = "e2e-mobile-login@example.test"
+MAILPIT_EMULATOR_URL = "http://10.0.2.2:54324"
 INJECTION_NAME = "'); DROP TABLE users;--"
 LOCAL_HOSTS = {"127.0.0.1", "localhost"}
 ADMIN_DB_URL = os.environ.get(
@@ -148,22 +149,22 @@ class Db:
     def reset_profile(self) -> None:
         self.run(
             "UPDATE users SET full_name = NULL, date_of_birth = NULL, gender = NULL "
-            "WHERE phone_number = :p AND erased_at IS NULL",
-            p=TEST_PHONE_DB,
+            "WHERE email = :p AND erased_at IS NULL",
+            p=TEST_EMAIL,
         )
 
     def revoke_health_data(self) -> None:
         self.run(
             "UPDATE user_consents SET status = 'thu_hoi', revoked_at = now() "
             "WHERE consent_type = 'health_data' AND status = 'dong_y' "
-            "AND user_id IN (SELECT id FROM users WHERE phone_number = :p)",
-            p=TEST_PHONE_DB,
+            "AND user_id IN (SELECT id FROM users WHERE email = :p)",
+            p=TEST_EMAIL,
         )
 
-    def phone_rows(self) -> list[dict]:
+    def email_rows(self) -> list[dict]:
         rows = self.run(
-            "SELECT id::text AS id, full_name, phone_number FROM users WHERE phone_number = :p",
-            p=TEST_PHONE_DB,
+            "SELECT id::text AS id, full_name, email FROM users WHERE email = :p",
+            p=TEST_EMAIL,
         )
         return [dict(r._mapping) for r in rows]
 
@@ -273,7 +274,10 @@ def run_flutter_phase(phase: int, device: str, port: int, secrets_: list[str]) -
         f"{E2E_DIR}/{PHASES[phase]}",
         "-d",
         device,
+        "--dart-define=DRUGTIME_PREVIEW=false",
         f"--dart-define=DRUGTIME_API_BASE_URL=http://10.0.2.2:{port}",
+        f"--dart-define=DRUGTIME_TEST_LOGIN_EMAIL={TEST_EMAIL}",
+        f"--dart-define=DRUGTIME_TEST_MAILPIT_URL={MAILPIT_EMULATOR_URL}",
     ]
     print(
         f"\n=== Pha {phase}: flutter test {E2E_DIR}/{PHASES[phase]} -d {device}",
@@ -290,7 +294,7 @@ def run_flutter_phase(phase: int, device: str, port: int, secrets_: list[str]) -
     )
     assert proc.stdout is not None
     for line in proc.stdout:
-        print(redact(line.rstrip("\n"), secrets_), flush=True)
+        print(redact(line.rstrip("\n"), [*secrets_, TEST_EMAIL]), flush=True)
     return proc.wait() == 0
 
 
@@ -353,11 +357,11 @@ def main(argv: list[str] | None = None) -> int:
             if not passed:
                 failures.append(f"Pha {phase}: flutter test fail")
                 break
-            rows = db.phone_rows()
+            rows = db.email_rows()
             print(f"Đối chiếu DB sau pha {phase}:")
             check(
                 len(rows) == 1,
-                f"đúng một dòng users cho {TEST_PHONE_DB} (thấy {len(rows)})",
+                f"đúng một dòng users cho email kiểm thử (thấy {len(rows)})",
                 failures,
             )
             if len(rows) != 1:

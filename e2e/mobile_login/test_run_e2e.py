@@ -88,3 +88,24 @@ def test_main_exits_2_when_environment_missing(monkeypatch, capsys):
 
     assert run_e2e.main([]) == 2
     assert "LỖI MÔI TRƯỜNG" in capsys.readouterr().err
+
+def test_flutter_phase_configures_local_email_and_redacts_identifier(monkeypatch, capsys):
+    seen = []
+
+    class Process:
+        stdout = [run_e2e.TEST_EMAIL + "\n"]
+
+        def wait(self):
+            return 0
+
+    def launch(cmd, **kwargs):
+        seen.extend(cmd)
+        return Process()
+
+    monkeypatch.setattr(run_e2e, "_which", lambda name: name)
+    monkeypatch.setattr(run_e2e.subprocess, "Popen", launch)
+    assert run_e2e.run_flutter_phase(1, "emulator-5554", 8000, [])
+    assert "--dart-define=DRUGTIME_PREVIEW=false" in seen
+    assert f"--dart-define=DRUGTIME_TEST_LOGIN_EMAIL={run_e2e.TEST_EMAIL}" in seen
+    assert "--dart-define=DRUGTIME_TEST_MAILPIT_URL=http://10.0.2.2:54324" in seen
+    assert run_e2e.TEST_EMAIL not in capsys.readouterr().out
